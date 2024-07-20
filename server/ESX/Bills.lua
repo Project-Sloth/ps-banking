@@ -40,7 +40,6 @@ function createBill(data)
     local description = data.description
     local type = data.type
     local amount = data.amount
-    local isPaid = data.isPaid
     MySQL.Sync.execute(
         "INSERT INTO ps_banking_bills (identifier, description, type, amount, date, isPaid) VALUES (@identifier, @description, @type, @amount, @date, @isPaid)",
         {
@@ -60,7 +59,5 @@ exports("createBill", createBill)
         description = "Utility Bill",
         type = "Expense",
         amount = 150.00,
-        date = os.date("%Y-%m-%d"),
-        isPaid = false,
     })
 ]]

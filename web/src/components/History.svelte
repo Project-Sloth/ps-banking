@@ -80,7 +80,7 @@
     >
       <div class="flex items-center mb-4">
         <i class="fa-duotone fa-list text-2xl text-blue-400 mr-3"></i>
-        <h2 class="text-2xl font-bold">{$Locales.transactions}</h2>
+        <h2 class="text-2xl font-bold">{$Locales.history}</h2>
       </div>
       <div class="flex justify-between items-center mb-4">
         <div class="flex items-center">

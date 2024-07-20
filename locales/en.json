@@ -83,5 +83,7 @@
   "withdrawn": "You have withdrawn",
   "deposited": "You have deposited",
   "transactions_trend": "Transactions Trend",
-  "total_transactions": "Total Transactions"
+  "total_transactions": "Total Transactions",
+  "openBank": "Access Bank",
+  "openATM": "Access ATM"
 }

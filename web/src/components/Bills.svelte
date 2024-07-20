@@ -77,7 +77,7 @@
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center">
           <i class="fa-duotone fa-list text-3xl text-blue-200 mr-3"></i>
-          <h2 class="text-3xl font-bold text-blue-200">{$Locales.invoices}</h2>
+          <h2 class="text-3xl font-bold text-blue-200">{$Locales.bills}</h2>
         </div>
         <div class="bg-[#334155] rounded-full px-3 py-1 flex items-center">
           <i class="fa-duotone fa-file-invoice-dollar text-gray-400 mr-2"></i>

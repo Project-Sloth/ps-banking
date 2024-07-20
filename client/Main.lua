@@ -21,7 +21,7 @@ Citizen.CreateThread(function()
             options = {
                 {
                     icon = "fas fa-credit-card",
-                    label = "Tilgå Bank",
+                    label = locale("openBank"),
                     action = function()
                         SendNUIMessage({
                             action = "openBank",
@@ -33,6 +33,7 @@ Citizen.CreateThread(function()
             distance = 2.5,
         })
     end
+
     for i = 1, #Config.BankLocations.Coords do
         local blip = AddBlipForCoord(vector3(Config.BankLocations.Coords[i].x, Config.BankLocations.Coords[i].y,
             Config.BankLocations.Coords[i].z))
@@ -60,7 +61,7 @@ exports["qb-target"]:AddTargetModel(Config.ATM_Models, {
     options = {
         {
             icon = "fas fa-solid fa-money-bills",
-            label = "Tilgå ATM",
+            label = locale("openATM"),
             action = function()
                 ATM_Animation()
                 SendNUIMessage({

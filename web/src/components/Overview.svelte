@@ -163,7 +163,7 @@
             {$Locales.easy_transfer}
           </div>
           <button
-            class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
+            class="relative -bottom-12 bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
             on:click={openModal}
           >
             {$Locales.transfer}
@@ -182,7 +182,7 @@
             {$Locales.pay_pending_bills}
           </div>
           <button
-            class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
+            class="relative -bottom-12 bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-8 mt-4 duration-500 rounded-lg cursor-pointer"
             on:click={() => {
               showSureModalBills.set(true);
             }}
@@ -201,7 +201,7 @@
             {$Locales.withdraw_all_from_account}
           </div>
           <button
-            class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
+            class="relative bottom-1 bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
             on:click={() => {
               if ($bankBalance <= 0) {
                 Notify(
@@ -234,7 +234,7 @@
             {$Locales.deposit_all_cash}
           </div>
           <button
-            class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
+            class="relative -bottom-12 bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
             on:click={() => {
               if ($currentCash <= 0) {
                 Notify($Locales.no_cash_on_you, $Locales.error, "coins");
