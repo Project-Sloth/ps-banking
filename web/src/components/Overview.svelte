@@ -97,12 +97,33 @@
     }
   }
 
-  function confirmTransfer() {
+  async function confirmTransfer(id: any, amount: any, method: any) {
+    try {
+      const response = await fetchNui("ps-banking:client:transferMoney", {
+        id: id,
+        amount: amount,
+        method: method,
+      });
+      console.log(JSON.stringify(response));
+      if (response.success) {
+        Notify(response.message, $Locales.payment_completed, "user");
+      } else {
+        Notify(response.message, $Locales.error, "user");
+      }
+    } catch (error) {
+      console.error(error);
+    }
     transferData.update((data) => {
       data.confirm = true;
       return data;
     });
     showTransferModal.set(false);
+    transferData.set({
+      idOrPhone: "",
+      amount: 0,
+      confirm: false,
+      contactType: "none",
+    });
   }
 
   let bankData = {
@@ -163,7 +184,7 @@
             {$Locales.easy_transfer}
           </div>
           <button
-            class="relative -bottom-12 bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
+            class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
             on:click={openModal}
           >
             {$Locales.transfer}
@@ -182,7 +203,7 @@
             {$Locales.pay_pending_bills}
           </div>
           <button
-            class="relative -bottom-12 bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-8 mt-4 duration-500 rounded-lg cursor-pointer"
+            class="relative -bottom-auto bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-8 mt-4 duration-500 rounded-lg cursor-pointer"
             on:click={() => {
               showSureModalBills.set(true);
             }}
@@ -201,7 +222,7 @@
             {$Locales.withdraw_all_from_account}
           </div>
           <button
-            class="relative bottom-1 bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
+            class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
             on:click={() => {
               if ($bankBalance <= 0) {
                 Notify(
@@ -234,7 +255,7 @@
             {$Locales.deposit_all_cash}
           </div>
           <button
-            class="relative -bottom-12 bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
+            class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-2 px-4 mt-4 duration-500 rounded-lg cursor-pointer"
             on:click={() => {
               if ($currentCash <= 0) {
                 Notify($Locales.no_cash_on_you, $Locales.error, "coins");
@@ -572,7 +593,13 @@
           </button>
           <button
             class="flex items-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none"
-            on:click={confirmTransfer}
+            on:click={async () => {
+              confirmTransfer(
+                $transferData.idOrPhone,
+                $transferData.amount,
+                $transferData.contactType
+              );
+            }}
           >
             <i class="fa-duotone fa-check-circle mr-2"></i>{$Locales.confirm}
           </button>

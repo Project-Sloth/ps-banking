@@ -13,3 +13,11 @@ RegisterNUICallback("ps-banking:client:getWeeklySummary", function(data, cb)
     local summary = lib.callback.await("ps-banking:server:getWeeklySummary", false)
     cb(summary)
 end)
+
+RegisterNUICallback("ps-banking:client:transferMoney", function(data, cb)
+    local success, message = lib.callback.await("ps-banking:server:transferMoney", false, data)
+    cb({
+        success = success,
+        message = message,
+    })
+end)
