@@ -27,7 +27,17 @@ Config.BankLocations = {
     },
 }
 
-Config.ATM_Animation = {
+-- ATM stuff
+Config.PresetATM_Amounts = { -- The preset amounts
+    Amounts = {
+        2000,
+        5000,
+        10000,
+    },
+    Grid = 3, -- How many there should be on each
+}
+
+Config.ATM_Animation = { -- Anim when opening ATM
     dict = "anim@amb@prop_human_atm@interior@male@enter",
     name = "enter",
     flag = 49,

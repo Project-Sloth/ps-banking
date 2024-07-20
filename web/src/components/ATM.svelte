@@ -16,10 +16,23 @@
 
   let customWithdraw = writable(0);
   let customDeposit = writable(0);
-  let withdrawAmounts = [2000, 5000, 10000];
-  let depositAmounts = [2000, 5000, 10000];
+  let withdrawAmounts = writable([]);
+  let depositAmounts = writable([]);
+  let gridColsPreset = writable(3);
 
   $: (customDeposit = currentCash), (customWithdraw = bankBalance);
+
+  async function getAmountPresets() {
+    try {
+      const response = await fetchNui("ps-banking:client:getAmountPresets", {});
+      const amounts = JSON.parse(response);
+      withdrawAmounts.set(amounts.withdrawAmounts);
+      depositAmounts.set(amounts.depositAmounts);
+      gridColsPreset.set(amounts.grid);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   async function updateBalances() {
     try {
@@ -99,6 +112,7 @@
   }
 
   onMount(() => {
+    getAmountPresets();
     getLocales();
     updateBalances();
     const keyHandler = (e: KeyboardEvent) => {
@@ -119,7 +133,7 @@
     out:scale={{ duration: 1000, easing: quintOut }}
   >
     <div
-      class="h-[70%] w-[60%] bg-gray-800 rounded-3xl p-8 shadow-2xl relative border border-blue-200/10"
+      class="h-auto w-auto bg-gray-800 rounded-3xl p-8 shadow-2xl relative border border-blue-200/10"
     >
       <div class="text-4xl font-bold text-center text-blue-200 mb-6">
         <i class="fa-duotone fa-atm text-blue-200 mr-2"></i>{$Locales.atm}
@@ -156,8 +170,11 @@
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-3 gap-4 mb-8">
-        {#each withdrawAmounts as amount}
+      <div
+        class="grid"
+        style={`grid-template-columns: repeat(${$gridColsPreset}, minmax(0, 1fr)); gap: 10px;`}
+      >
+        {#each $withdrawAmounts as amount}
           <button
             class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-4 px-6 rounded-xl duration-500 cursor-pointer flex items-center justify-center gap-2"
             on:click={() => {
@@ -173,7 +190,7 @@
             })}
           </button>
         {/each}
-        {#each depositAmounts as amount}
+        {#each $depositAmounts as amount}
           <button
             class="bg-green-600/10 border border-green-500 hover:bg-green-800/50 text-white font-bold py-4 px-6 rounded-xl duration-500 cursor-pointer flex items-center justify-center gap-2"
             on:click={() => {

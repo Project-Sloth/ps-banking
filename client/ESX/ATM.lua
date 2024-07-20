@@ -23,3 +23,10 @@ RegisterNUICallback("ps-banking:client:getMoneyTypes", function(data, cb)
     cb(moneyData)
 end)
 
+RegisterNUICallback("ps-banking:client:getAmountPresets", function(_, cb)
+    cb(json.encode({
+        withdrawAmounts = Config.PresetATM_Amounts.Amounts,
+        depositAmounts = Config.PresetATM_Amounts.Amounts,
+        grid = Config.PresetATM_Amounts.Grid,
+    }))
+end)
