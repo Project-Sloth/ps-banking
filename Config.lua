@@ -1,7 +1,5 @@
 lib.locale()
 Config = {}
-
-Config.FrameWork = "QB" -- "ESX" or "QB"
 Config.LBPhone = false -- Does your server use lb-phone?
 
 Config.Currency = {

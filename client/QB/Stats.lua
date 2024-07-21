@@ -1,4 +1,4 @@
-if Config.FrameWork ~= "QB" then
+if GetResourceState("qb-core") ~= "started" then
     return
 end
 
