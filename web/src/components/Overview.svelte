@@ -1,10 +1,10 @@
 <script lang="ts">
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
-  import { useNuiEvent } from "../utils/useNuiEvent";
+  import Chart from "chart.js/auto";
   import { fetchNui } from "../utils/fetchNui";
-  import { slide, fade } from "svelte/transition";
   import { quintOut } from "svelte/easing";
+  import { slide, fade, scale } from "svelte/transition";
   import {
     showOverview,
     showBills,
@@ -34,14 +34,39 @@
   });
 
   let weeklyData = writable({
-    used: 0,
-    received: 0,
+    totalReceived: 0,
+    totalUsed: 0,
   });
+
+  let chart: Chart;
+  let chartCanvas: HTMLCanvasElement;
 
   async function fetchWeeklySummary() {
     try {
       const response = await fetchNui("ps-banking:client:getWeeklySummary", {});
-      weeklyData.set(response);
+      if (response) {
+        weeklyData.set(response);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function updateBalances() {
+    try {
+      const response = await fetchNui("ps-banking:client:getMoneyTypes", {});
+      const bank = response.find(
+        (item: { name: string }) => item.name === "bank"
+      );
+      const cash = response.find(
+        (item: { name: string }) => item.name === "cash"
+      );
+      if (bank) {
+        bankBalance.set(bank.amount);
+      }
+      if (cash) {
+        currentCash.set(cash.amount);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -104,7 +129,6 @@
         amount: amount,
         method: method,
       });
-      console.log(JSON.stringify(response));
       if (response.success) {
         Notify(response.message, $Locales.payment_completed, "user");
       } else {
@@ -132,24 +156,84 @@
     transactions: $Transactions,
   };
 
-  $: {
-    bankData = {
-      balance: $bankBalance,
-      cash: $currentCash,
-      transactions: $Transactions,
-    };
+  $: bankData = {
+    balance: $bankBalance,
+    cash: $currentCash,
+    transactions: $Transactions,
+  };
+
+  async function heav() {
+    try {
+      const response = await fetchNui("ps-banking:client:ATMwithdraw", {
+        amount: $bankBalance,
+      });
+      if (response) {
+        updateStuff();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  onMount(async () => {
+  async function deposit() {
+    try {
+      const response = await fetchNui("ps-banking:client:ATMdeposit", {
+        amount: $currentCash,
+      });
+      if (response) {
+        updateStuff();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function createChart() {
+    if (chartCanvas) {
+      chart = new Chart(chartCanvas, {
+        type: "bar",
+        data: {
+          labels: [$Locales.income, $Locales.expenses],
+          datasets: [
+            {
+              label: $Locales.weekly_summary,
+              data: [0, 0],
+              backgroundColor: ["#3b82f6", "#ef4444"],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    }
+  }
+
+  $: {
+    weeklyData.subscribe((data) => {
+      if (chart) {
+        chart.data.datasets[0].data = [data.totalReceived, data.totalUsed];
+        chart.update("smooth");
+      }
+    });
+  }
+
+  async function updateStuff() { // Hot update
     await getBills();
     await getHistory();
     await fetchWeeklySummary();
-  });
+    await updateBalances();
+  }
 
-  let weeklyDataValue = $weeklyData;
-  let maxAmount = Math.max(weeklyDataValue.received, weeklyDataValue.used);
-  let receivedHeight = (weeklyDataValue.received / maxAmount) * 100;
-  let usedHeight = (weeklyDataValue.used / maxAmount) * 100;
+  onMount(async () => {
+    createChart();
+    updateStuff();
+  });
 </script>
 
 <div class="absolute w-full h-full bg-gray-800">
@@ -236,8 +320,9 @@
                   $Locales.success,
                   "credit-card"
                 );
-                currentCash.update((cash) => cash + $bankBalance);
-                bankBalance.set(0);
+                setTimeout(() => {
+                  heav();
+                }, 200);
               }
             }}
           >
@@ -261,8 +346,9 @@
                 Notify($Locales.no_cash_on_you, $Locales.error, "coins");
               } else {
                 Notify($Locales.deposit_all_success, $Locales.success, "coins");
-                bankBalance.update((bank) => bank + $currentCash);
-                currentCash.set(0);
+                setTimeout(() => {
+                  deposit();
+                }, 200);
               }
             }}
           >
@@ -289,8 +375,8 @@
           <div class="flex justify-between border-b border-gray-600 pb-2">
             <span>{$Locales.income}</span>
             <span class="text-blue-400">
-              {#if $weeklyData.received !== undefined}
-                {$weeklyData.received.toLocaleString($Currency.lang, {
+              {#if $weeklyData.totalReceived !== undefined}
+                {$weeklyData.totalReceived.toLocaleString($Currency.lang, {
                   style: "currency",
                   currency: $Currency.currency,
                   minimumFractionDigits: 0,
@@ -303,8 +389,8 @@
           <div class="flex justify-between border-b border-gray-600 pb-2">
             <span>{$Locales.expenses}</span>
             <span class="text-red-400">
-              {#if $weeklyData.used !== undefined}
-                {$weeklyData.used.toLocaleString($Currency.lang, {
+              {#if $weeklyData.totalUsed !== undefined}
+                {$weeklyData.totalUsed.toLocaleString($Currency.lang, {
                   style: "currency",
                   currency: $Currency.currency,
                   minimumFractionDigits: 0,
@@ -316,18 +402,11 @@
           </div>
           <div class="mt-6">
             <div class="flex items-center mb-2">
-              <i class="fa-duotone fa-chart-bar text-xl text-gray-400 mr-2"></i>
+              <i class="fa-duotone fa-chart-bar text-xl text-blue-400 mr-2"></i>
               <span>{$Locales.report}</span>
             </div>
-            <div class="flex items-end space-x-2 mt-4 h-20">
-              <div
-                class="w-2 bg-red-400"
-                style={`height: ${usedHeight}%`}
-              ></div>
-              <div
-                class="w-2 bg-blue-400"
-                style={`height: ${receivedHeight}%`}
-              ></div>
+            <div>
+              <canvas bind:this={chartCanvas}></canvas>
             </div>
           </div>
         </div>
@@ -403,7 +482,7 @@
               >{$Locales.unpaid_bills}</span
             >
           </div>
-          <div class="bg-gray-700/90 rounded-full px-2 py-1">
+          <div class="bg-gray-600 rounded-full px-2 py-1">
             <span class="text-white text-sm">{$transactions.length}</span>
           </div>
         </div>

@@ -133,7 +133,7 @@
     out:scale={{ duration: 1000, easing: quintOut }}
   >
     <div
-      class="h-auto w-auto bg-gray-800 rounded-3xl p-8 shadow-2xl relative border border-blue-200/10"
+      class="h-auto w-[60%] bg-gray-800 rounded-3xl p-8 shadow-2xl relative border border-blue-200/10"
     >
       <div class="text-4xl font-bold text-center text-blue-200 mb-6">
         <i class="fa-duotone fa-atm text-blue-200 mr-2"></i>{$Locales.atm}
@@ -170,10 +170,7 @@
           </div>
         </div>
       </div>
-      <div
-        class="grid"
-        style={`grid-template-columns: repeat(${$gridColsPreset}, minmax(0, 1fr)); gap: 10px;`}
-      >
+      <div class="grid" style={`grid-template-columns: repeat(${$gridColsPreset}, minmax(0, 1fr)); gap: 10px;`}>
         {#each $withdrawAmounts as amount}
           <button
             class="bg-blue-600/10 border border-blue-500 hover:bg-blue-800/50 text-white font-bold py-4 px-6 rounded-xl duration-500 cursor-pointer flex items-center justify-center gap-2"

@@ -85,5 +85,10 @@
   "transactions_trend": "Transactions Trend",
   "total_transactions": "Total Transactions",
   "openBank": "Access Bank",
-  "openATM": "Access ATM"
+  "openATM": "Access ATM",
+  "cannot_send_self_money": "You cannot send yourself money",
+  "money_sent": "You have sent %s to %s",
+  "no_money": "No Money",
+  "user_not_in_city": "The user is not in the city",
+  "received_money": "%s has sent you %s"
 }

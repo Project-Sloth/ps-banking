@@ -35,8 +35,9 @@ RegisterNetEvent("ps-banking:server:logClient", function(account, moneyData)
 
     local currentBankBalance = xPlayer.getAccount(account.name).money
     local amountChange = currentBankBalance - previousBankBalance
-    local isIncome = amountChange > 0
+    local isIncome = currentBankBalance >= previousBankBalance and true or false
     local description = "Transaction"
+
 
     logTransaction(identifier, description, account.name, math.abs(amountChange), isIncome)
 end)

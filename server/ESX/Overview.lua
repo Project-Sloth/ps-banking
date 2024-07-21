@@ -26,15 +26,18 @@ lib.callback.register("ps-banking:server:getWeeklySummary", function(source)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
     local receivedResult = MySQL.Sync.fetchAll(
-        "SELECT SUM(amount) as totalReceived FROM ps_banking_transactions WHERE identifier = @identifier AND DATE(date) >= DATE(NOW() - INTERVAL 7 DAY)",
+        "SELECT SUM(amount) as totalReceived FROM ps_banking_transactions WHERE identifier = @identifier AND isIncome = @isIncome AND DATE(date) >= DATE(NOW() - INTERVAL 7 DAY)",
         {
             ["@identifier"] = identifier,
+            ["@isIncome"] = true,
         })
     local totalReceived = receivedResult[1].totalReceived or 0
     local usedResult = MySQL.Sync.fetchAll(
-        "SELECT SUM(amount) as totalUsed FROM ps_banking_transactions WHERE identifier = @identifier AND DATE(date) >= DATE(NOW() - INTERVAL 7 DAY)",
+        "SELECT SUM(amount) as totalUsed FROM ps_banking_transactions WHERE identifier = @identifier AND isIncome = @isIncome AND DATE(date) >= DATE(NOW() - INTERVAL 7 DAY)",
         {
             ["@identifier"] = identifier,
+            ["@isIncome"] = false,
+
         })
     local totalUsed = usedResult[1].totalUsed or 0
     return {
@@ -49,7 +52,7 @@ lib.callback.register("ps-banking:server:transferMoney", function(source, data)
     local amount = tonumber(data.amount)
 
     if data.id == source and data.method == "id" then
-        return false, "You cannot send yourself money"
+        return false, locale("cannot_send_self_money")
     end
 
     if xPlayer and targetPlayer and amount > 0 then
@@ -58,16 +61,16 @@ lib.callback.register("ps-banking:server:transferMoney", function(source, data)
             if data.method == "id" then
                 xPlayer.removeAccountMoney("bank", amount)
                 targetPlayer.addAccountMoney("bank", amount)
-                return true, "You have sent " .. amount .. " to " .. targetPlayer.getName()
+                return true, locale("money_sent", amount, targetPlayer.getName())
             elseif data.method == "phone" then
                 exports["lb-phone"]:AddTransaction(targetPlayer.identifier, amount,
-                    xPlayer.getName() .. " has sent you " .. amount)
-                return true, "You have sent " .. amount .. " to " .. targetPlayer.getName()
+                    locale("received_money", xPlayer.getName(), amount))
+                return true, locale("money_sent", amount, targetPlayer.getName())
             end
         else
-            return false, "No Money"
+            return false, locale("no_money")
         end
     else
-        return false, "The user is not in the city"
+        return false, locale("user_not_in_city")
     end
 end)

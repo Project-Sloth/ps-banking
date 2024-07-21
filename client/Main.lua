@@ -1,5 +1,3 @@
-lib.locale()
-
 RegisterNUICallback("ps-banking:client:getLocales", function(_, cb)
     cb(lib.getLocales())
 end)

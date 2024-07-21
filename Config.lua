@@ -1,3 +1,4 @@
+lib.locale()
 Config = {}
 
 Config.FrameWork = "ESX" -- or QB
