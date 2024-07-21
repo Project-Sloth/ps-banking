@@ -230,10 +230,21 @@
     await fetchWeeklySummary();
     await updateBalances();
   }
+  
+  async function phoneOption() {
+    try {
+      const response = await fetchNui("ps-banking:client:phoneOption", {});
+      phone = response
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   onMount(async () => {
     createChart();
     updateStuff();
+    updateStuff();
+    phoneOption();
   });
 </script>
 

@@ -7,6 +7,11 @@ RegisterNUICallback("ps-banking:client:hideUI", function(_, cb)
     cb({})
 end)
 
+RegisterNUICallback("ps-banking:client:phoneOption", function(_, cb)
+    cb(Config.LBPhone)
+end)
+
+
 Citizen.CreateThread(function()
     for _, location in pairs(Config.BankLocations.Coords) do
         exports["qb-target"]:AddBoxZone("bank", vector3(location), 1.5, 1.6, {
