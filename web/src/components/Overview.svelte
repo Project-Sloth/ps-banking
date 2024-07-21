@@ -218,7 +218,7 @@
     weeklyData.subscribe((data) => {
       if (chart) {
         chart.data.datasets[0].data = [data.totalReceived, data.totalUsed];
-        chart.update("smooth");
+        chart.update();
       }
     });
   }
