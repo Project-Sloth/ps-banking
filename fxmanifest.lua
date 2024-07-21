@@ -2,8 +2,8 @@ fx_version "cerulean"
 game "gta5"
 author "Project Sloth"
 lua54 "yes"
--- ui_page "html/index.html"
-ui_page "http://localhost:5173"
+ui_page "html/index.html"
+-- ui_page "http://localhost:5173"
 
 client_scripts {
     "client/**/*",
