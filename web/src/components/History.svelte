@@ -1,8 +1,8 @@
 <script lang="ts">
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
-  import { slide, fade } from "svelte/transition";
   import { quintOut } from "svelte/easing";
+  import { slide, fade, scale } from "svelte/transition";
   import { fetchNui } from "../utils/fetchNui";
   import {
     showOverview,
@@ -172,7 +172,11 @@
   <div
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
   >
-    <div class="bg-gray-700 p-8 rounded-lg shadow-lg w-96">
+    <div
+      class="bg-gray-700 p-8 rounded-lg shadow-lg w-96"
+      in:scale={{ duration: 250, easing: quintOut }}
+      out:scale={{ duration: 250, easing: quintOut }}
+    >
       <div class="flex items-center mb-4">
         <i class="fa-duotone fa-question-circle text-3xl text-blue-400 mr-3"
         ></i>

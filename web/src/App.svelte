@@ -6,7 +6,6 @@
   import { notifications, showATM } from "../src/store/data";
   import { visibility } from "../src/store/stores";
 
-
   debugData([
     {
       action: "openBank",

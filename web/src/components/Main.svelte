@@ -9,6 +9,7 @@
   import HeavPage from "./Heav.svelte";
   import IndseatPage from "./Indseat.svelte";
   import StatsPage from "./Stats.svelte";
+  import AccountsPage from "./Accounts.svelte";
   import { slide, fade, scale } from "svelte/transition";
   import { quintOut } from "svelte/easing";
   import {
@@ -18,6 +19,7 @@
     showHeav,
     showIndseat,
     showStats,
+    showAccounts,
     Locales,
     bankBalance,
     currentCash,
@@ -75,6 +77,8 @@
       <IndseatPage />
     {:else if $showStats}
       <StatsPage />
+    {:else if $showAccounts}
+      <AccountsPage />
     {/if}
     <!-- SideBar -->
     <div
@@ -97,6 +101,7 @@
               showHeav.set(false);
               showIndseat.set(false);
               showStats.set(false);
+              showAccounts.set(false);
             }}
           />
           <span
@@ -123,6 +128,7 @@
               showHeav.set(false);
               showIndseat.set(false);
               showStats.set(false);
+              showAccounts.set(false);
             }}
           />
           <span
@@ -150,6 +156,7 @@
               showHeav.set(false);
               showIndseat.set(false);
               showStats.set(false);
+              showAccounts.set(false);
             }}
           />
           <span
@@ -177,11 +184,12 @@
               showHeav.set(true);
               showIndseat.set(false);
               showStats.set(false);
+              showAccounts.set(false);
             }}
           />
           <span
             class="w-[97%] relative flex flex-col items-center text-gray-300 py-4 peer-checked:shadow-md transition-all duration-500 rounded-xl
-            peer-checked:text-blue-400 peer-checked:shadow-lg hover:text-blue-300 duration-500 peer-checked:bg-gray-600 hover:cursor-pointer hover:bg-gray-800/80"
+              peer-checked:text-blue-400 peer-checked:shadow-lg hover:text-blue-300 duration-500 peer-checked:bg-gray-600 hover:cursor-pointer hover:bg-gray-800/80"
           >
             <i class="fa-duotone fa-minus text-3xl text-blue-300 mb-2"></i>
             <span class="relative">{$Locales.withdraw}</span>
@@ -203,11 +211,12 @@
               showHeav.set(false);
               showIndseat.set(true);
               showStats.set(false);
+              showAccounts.set(false);
             }}
           />
           <span
             class="w-[97%] relative flex flex-col items-center text-gray-300 py-4 peer-checked:shadow-md transition-all duration-500 rounded-xl
-          peer-checked:text-blue-400 peer-checked:shadow-lg hover:text-blue-300 duration-500 peer-checked:bg-gray-600 hover:cursor-pointer hover:bg-gray-800/80"
+              peer-checked:text-blue-400 peer-checked:shadow-lg hover:text-blue-300 duration-500 peer-checked:bg-gray-600 hover:cursor-pointer hover:bg-gray-800/80"
           >
             <i class="fa-duotone fa-plus text-3xl text-blue-300 mb-2"></i>
             <span class="relative">{$Locales.deposit}</span>
@@ -229,21 +238,49 @@
               showHeav.set(false);
               showIndseat.set(false);
               showStats.set(true);
+              showAccounts.set(false);
             }}
           />
           <span
             class="w-[97%] relative flex flex-col items-center text-gray-300 py-4 peer-checked:shadow-md transition-all duration-500 rounded-xl
-        peer-checked:text-blue-400 peer-checked:shadow-lg hover:text-blue-300 duration-500 peer-checked:bg-gray-600 hover:cursor-pointer hover:bg-gray-800/80"
+              peer-checked:text-blue-400 peer-checked:shadow-lg hover:text-blue-300 duration-500 peer-checked:bg-gray-600 hover:cursor-pointer hover:bg-gray-800/80"
           >
             <i class="fa-duotone fa-chart-simple text-3xl text-blue-300 mb-2"
             ></i>
             <span class="relative">{$Locales.stats}</span>
           </span>
         </label>
+        <label
+          class="text-white font-bold p-0 rounded flex flex-col items-center uppercase w-[97%]"
+        >
+          <input
+            type="radio"
+            name="radio"
+            value="control"
+            class="hidden peer"
+            checked={$showAccounts}
+            on:change={() => {
+              showOverview.set(false);
+              showBills.set(false);
+              showHistory.set(false);
+              showHeav.set(false);
+              showIndseat.set(false);
+              showStats.set(false);
+              showAccounts.set(true);
+            }}
+          />
+          <span
+            class="w-[97%] relative flex flex-col items-center text-gray-300 py-4 peer-checked:shadow-md transition-all duration-500 rounded-xl
+              peer-checked:text-blue-400 peer-checked:shadow-lg hover:text-blue-300 duration-500 peer-checked:bg-gray-600 hover:cursor-pointer hover:bg-gray-800/80"
+          >
+            <i class="fa-duotone fa-users text-3xl text-blue-300 mb-2"></i>
+            <span class="relative">{$Locales.accounts}</span>
+          </span>
+        </label>
         <!-- Close -->
-        <div class="absolute bottom-5 left-[0px]">
+        <div class="relative -bottom-48 left-[.5px]">
           <button
-            class="w-[97%] text-blue-200 font-bold uppercase p-5 rounded-lg hover:bg-gray-800/80 duration-500"
+            class="w-[95%] text-blue-200 font-bold uppercase p-5 rounded-lg hover:bg-gray-800/80 duration-500 h-[100px] flex flex-col items-center"
             on:click={() => {
               fetchNui("ps-banking:client:hideUI");
               visibility.set(false);

@@ -223,7 +223,8 @@
     });
   }
 
-  async function updateStuff() { // Hot update
+  async function updateStuff() {
+    // Hot update
     await getBills();
     await getHistory();
     await fetchWeeklySummary();
@@ -562,7 +563,11 @@
     <div
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
     >
-      <div class="p-8 bg-gray-800 rounded-lg shadow-lg w-96">
+      <div
+        class="p-8 bg-gray-800 rounded-lg shadow-lg w-96"
+        in:scale={{ duration: 250, easing: quintOut }}
+        out:scale={{ duration: 250, easing: quintOut }}
+      >
         <div class="flex items-center mb-4">
           <i
             class="fa-duotone fa-arrow-right-arrow-left text-3xl text-blue-400 mr-3"
@@ -690,7 +695,11 @@
     <div
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
     >
-      <div class="bg-gray-700 p-8 rounded-lg shadow-lg w-96">
+      <div
+        class="bg-gray-700 p-8 rounded-lg shadow-lg w-96"
+        in:scale={{ duration: 250, easing: quintOut }}
+        out:scale={{ duration: 250, easing: quintOut }}
+      >
         <div class="flex items-center mb-4">
           <i class="fa-duotone fa-question-circle text-3xl text-blue-400 mr-3"
           ></i>

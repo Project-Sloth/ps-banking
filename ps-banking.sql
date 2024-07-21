@@ -22,6 +22,19 @@ CREATE TABLE
         PRIMARY KEY (`id`)
     ) ENGINE = InnoDB;
 
+CREATE TABLE
+    `ps_banking_accounts` (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `balance` BIGINT NOT NULL,
+        `holder` VARCHAR(255) NOT NULL,
+        `cardNumber` VARCHAR(255) NOT NULL,
+        `users` JSON NOT NULL,
+        `owner` JSON NOT NULL,
+        PRIMARY KEY (`id`)
+    ) ENGINE = InnoDB;
+
+    
+
 /* Dummy data (Ignore)
 INSERT INTO `ps_banking_bills` (`identifier`, `description`, `type`, `amount`, `date`, `isPaid`) VALUES
 ('char1:df6c12c50e2712c57b1386e7103d5a372fb960a0', 'Utility Bill', 'Expense', 150.00, '2024-07-20', 0);
