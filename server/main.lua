@@ -45,28 +45,21 @@ end
 lib.callback.register("ps-banking:server:getHistory", function(source)
     local xPlayer = getPlayerFromId(source)
     local identifier = getPlayerIdentifier(xPlayer)
-    local result = MySQL.Sync.fetchAll("SELECT * FROM ps_banking_transactions WHERE identifier = @identifier", {
-        ["@identifier"] = identifier,
-    })
+    local result = MySQL.query.await('SELECT * FROM ps_banking_transactions WHERE identifier = ?', { identifier })
     return result
 end)
 
 lib.callback.register("ps-banking:server:deleteHistory", function(source)
     local xPlayer = getPlayerFromId(source)
     local identifier = getPlayerIdentifier(xPlayer)
-    MySQL.Sync.execute("DELETE FROM ps_banking_transactions WHERE identifier = @identifier", {
-        ["@identifier"] = identifier,
-    })
+    MySQL.query.await('DELETE FROM ps_banking_transactions WHERE identifier = ?', { identifier })
     return true
 end)
 
 lib.callback.register("ps-banking:server:payAllBills", function(source)
     local xPlayer = getPlayerFromId(source)
     local identifier = getPlayerIdentifier(xPlayer)
-    local result = MySQL.Sync.fetchAll(
-        "SELECT SUM(amount) as total FROM ps_banking_bills WHERE identifier = @identifier AND isPaid = 0", {
-            ["@identifier"] = identifier,
-        })
+    local result = MySQL.query.await('SELECT SUM(amount) as total FROM ps_banking_bills WHERE identifier = ? AND isPaid = 0', { identifier })
     local totalAmount = result[1].total or 0
     local bankBalance = getPlayerAccounts(xPlayer)
     if tonumber(bankBalance) >= tonumber(totalAmount) then
@@ -75,9 +68,7 @@ lib.callback.register("ps-banking:server:payAllBills", function(source)
         elseif framework == "QBCore" then
             xPlayer.Functions.RemoveMoney("bank", tonumber(totalAmount))
         end
-        MySQL.Sync.execute("DELETE FROM ps_banking_bills WHERE identifier = @identifier", {
-            ["@identifier"] = identifier,
-        })
+        MySQL.query.await('DELETE FROM ps_banking_bills WHERE identifier = ?', { identifier })
         return true
     else
         return false
@@ -87,19 +78,9 @@ end)
 lib.callback.register("ps-banking:server:getWeeklySummary", function(source)
     local xPlayer = getPlayerFromId(source)
     local identifier = getPlayerIdentifier(xPlayer)
-    local receivedResult = MySQL.Sync.fetchAll(
-        "SELECT SUM(amount) as totalReceived FROM ps_banking_transactions WHERE identifier = @identifier AND isIncome = @isIncome AND DATE(date) >= DATE(NOW() - INTERVAL 7 DAY)",
-        {
-            ["@identifier"] = identifier,
-            ["@isIncome"] = true,
-        })
+    local receivedResult = MySQL.query.await('SELECT SUM(amount) as totalReceived FROM ps_banking_transactions WHERE identifier = ? AND isIncome = ? AND DATE(date) >= DATE(NOW() - INTERVAL 7 DAY)', { identifier, true })
     local totalReceived = receivedResult[1].totalReceived or 0
-    local usedResult = MySQL.Sync.fetchAll(
-        "SELECT SUM(amount) as totalUsed FROM ps_banking_transactions WHERE identifier = @identifier AND isIncome = @isIncome AND DATE(date) >= DATE(NOW() - INTERVAL 7 DAY)",
-        {
-            ["@identifier"] = identifier,
-            ["@isIncome"] = false,
-        })
+    local usedResult = MySQL.query.await('SELECT SUM(amount) as totalUsed FROM ps_banking_transactions WHERE identifier = ? AND isIncome = ? AND DATE(date) >= DATE(NOW() - INTERVAL 7 DAY)', { identifier, false })
     local totalUsed = usedResult[1].totalUsed or 0
     return {
         totalReceived = totalReceived,
@@ -141,16 +122,8 @@ lib.callback.register("ps-banking:server:transferMoney", function(source, data)
     end
 end)
 
-function logTransaction(identifier, description, accountName, amount, isIncome)
-    MySQL.Sync.execute(
-        "INSERT INTO ps_banking_transactions (identifier, description, type, amount, date, isIncome) VALUES (@identifier, @description, @type, @amount, NOW(), @isIncome)",
-        {
-            ["@identifier"] = identifier,
-            ["@description"] = description,
-            ["@type"] = accountName,
-            ["@amount"] = amount,
-            ["@isIncome"] = isIncome,
-        })
+local function logTransaction(identifier, description, accountName, amount, isIncome)
+    MySQL.insert.await('INSERT INTO ps_banking_transactions (identifier, description, type, amount, date, isIncome) VALUES (?, ?, ?, ?, NOW(), ?)', { identifier, description, accountName, amount, isIncome })
 end
 
 RegisterNetEvent("ps-banking:server:logClient", function(account, moneyData)
@@ -187,15 +160,9 @@ lib.callback.register("ps-banking:server:getTransactionStats", function(source)
     local xPlayer = getPlayerFromId(source)
     local identifier = getPlayerIdentifier(xPlayer)
 
-    local result = MySQL.Sync.fetchAll(
-        "SELECT COUNT(*) as totalCount, SUM(amount) as totalAmount FROM ps_banking_transactions WHERE identifier = @identifier",
-        {
-            ["@identifier"] = identifier,
-        })
-    local transactionData = MySQL.Sync.fetchAll(
-        "SELECT amount, date FROM ps_banking_transactions WHERE identifier = @identifier ORDER BY date DESC LIMIT 50", {
-            ["@identifier"] = identifier,
-        })
+    local result = MySQL.query.await('SELECT COUNT(*) as totalCount, SUM(amount) as totalAmount FROM ps_banking_transactions WHERE identifier = ?', { identifier })
+    local transactionData = MySQL.query.await('SELECT amount, date FROM ps_banking_transactions WHERE identifier = ? ORDER BY date DESC LIMIT 50', { identifier })
+
     return {
         totalCount = result[1].totalCount,
         totalAmount = result[1].totalAmount,
@@ -208,19 +175,8 @@ lib.callback.register("ps-banking:server:createNewAccount", function(source, new
     if not xPlayer then
         return false
     end
-    local promise = promise.new()
-    MySQL.Async.execute(
-        "INSERT INTO ps_banking_accounts (balance, holder, cardNumber, users, owner) VALUES (@balance, @holder, @cardNumber, @users, @owner)",
-        {
-            ["@balance"] = newAccount.balance,
-            ["@holder"] = newAccount.holder,
-            ["@cardNumber"] = newAccount.cardNumber,
-            ["@users"] = json.encode(newAccount.users),
-            ["@owner"] = json.encode(newAccount.owner),
-        }, function(rowsChanged)
-            promise:resolve(rowsChanged > 0)
-        end)
-    return Citizen.Await(promise)
+    MySQL.insert.await('INSERT INTO ps_banking_accounts (balance, holder, cardNumber, users, owner) VALUES (?, ?, ?, ?, ?)', { newAccount.balance, newAccount.holder, newAccount.cardNumber, json.encode(newAccount.users), json.encode(newAccount.owner) })
+    return true
 end)
 
 lib.callback.register("ps-banking:server:getUser", function(source)
@@ -240,7 +196,7 @@ lib.callback.register("ps-banking:server:getAccounts", function(source)
         return false
     end
     local playerIdentifier = getPlayerIdentifier(xPlayer)
-    local accounts = MySQL.Sync.fetchAll("SELECT * FROM ps_banking_accounts", {})
+    local accounts = MySQL.query.await('SELECT * FROM ps_banking_accounts')
     local result = {}
     for _, account in ipairs(accounts) do
         local accountData = {
@@ -272,13 +228,9 @@ lib.callback.register("ps-banking:server:deleteAccount", function(source, accoun
     if not xPlayer then
         return false
     end
-    local promise = promise.new()
-    MySQL.Async.execute("DELETE FROM ps_banking_accounts WHERE id = @id", {
-        ["@id"] = accountId,
-    }, function(rowsChanged)
-        promise:resolve(rowsChanged > 0)
-    end)
-    return Citizen.Await(promise)
+
+    MySQL.query.await('DELETE FROM ps_banking_transactions WHERE accountId = ?', { accountId })
+    return true
 end)
 
 lib.callback.register("ps-banking:server:withdrawFromAccount", function(source, accountId, amount)
@@ -286,29 +238,21 @@ lib.callback.register("ps-banking:server:withdrawFromAccount", function(source, 
     if not xPlayer then
         return false
     end
-    local account = MySQL.Sync.fetchAll("SELECT * FROM ps_banking_accounts WHERE id = @id", {
-        ["@id"] = accountId,
-    })
+    local account = MySQL.query.await('SELECT * FROM ps_banking_accounts WHERE id = ?', { accountId })
     if #account > 0 then
         local balance = account[1].balance
         if balance >= amount then
-            local promise = promise.new()
-            MySQL.Async.execute("UPDATE ps_banking_accounts SET balance = balance - @amount WHERE id = @id", {
-                ["@amount"] = amount,
-                ["@id"] = accountId,
-            }, function(rowsChanged)
-                if rowsChanged > 0 then
-                    if framework == "ESX" then
-                        xPlayer.addAccountMoney("bank", amount)
-                    elseif framework == "QBCore" then
-                        xPlayer.Functions.AddMoney("bank", amount)
-                    end
-                    promise:resolve(true)
-                else
-                    promise:resolve(false)
+            local affectedRows = MySQL.update.await('UPDATE ps_banking_accounts SET balance = balance - ? WHERE id = ?', { amount, accountId })
+            if affectedRows > 0 then
+                if framework == "ESX" then
+                    xPlayer.addAccountMoney("bank", amount)
+                elseif framework == "QBCore" then
+                    xPlayer.Functions.AddMoney("bank", amount)
                 end
-            end)
-            return Citizen.Await(promise)
+                return true
+            else
+                return false
+            end
         else
             return false
         end
@@ -323,23 +267,17 @@ lib.callback.register("ps-banking:server:depositToAccount", function(source, acc
         return false
     end
     if getPlayerAccounts(xPlayer) >= amount then
-        local promise = promise.new()
-        MySQL.Async.execute("UPDATE ps_banking_accounts SET balance = balance + @amount WHERE id = @id", {
-            ["@amount"] = amount,
-            ["@id"] = accountId,
-        }, function(rowsChanged)
-            if rowsChanged > 0 then
-                if framework == "ESX" then
-                    xPlayer.removeAccountMoney("bank", amount)
-                elseif framework == "QBCore" then
-                    xPlayer.Functions.RemoveMoney("bank", amount)
-                end
-                promise:resolve(true)
-            else
-                promise:resolve(false)
+        local affectedRows = MySQL.update.await('UPDATE ps_banking_accounts SET balance = balance + ? WHERE id = ?', { amount, accountId })
+        if affectedRows > 0 then
+            if framework == "ESX" then
+                xPlayer.removeAccountMoney("bank", amount)
+            elseif framework == "QBCore" then
+                xPlayer.Functions.RemoveMoney("bank", amount)
             end
-        end)
-        return Citizen.Await(promise)
+            return true
+        else
+            return false
+        end
     else
         return false
     end
@@ -350,61 +288,50 @@ lib.callback.register("ps-banking:server:addUserToAccount", function(source, acc
     local targetPlayer = getPlayerFromId(userId)
     local promise = promise.new()
     if source == userId then
-        promise:resolve({
+        return {
             success = false,
             message = locale("cannot_add_self"),
-        })
+        }
     end
     if not xPlayer then
-        promise:resolve({
+        return {
             success = false,
             message = locale("player_not_found"),
-        })
-        return Citizen.Await(promise)
+        }
     end
     if not targetPlayer then
-        promise:resolve({
+        return {
             success = false,
             message = locale("target_player_not_found"),
-        })
-        return Citizen.Await(promise)
+        }
     end
-    local accounts = MySQL.Sync.fetchAll("SELECT * FROM ps_banking_accounts WHERE id = @id", {
-        ["@id"] = accountId,
-    })
+    local accounts = MySQL.update.await('SELECT * FROM ps_banking_accounts WHERE id = ?', { accountId })
     if #accounts > 0 then
         local account = accounts[1]
         local users = json.decode(account.users)
         for _, user in ipairs(users) do
             if user.identifier == userId then
-                promise:resolve({
+                return {
                     success = false,
                     message = locale("user_already_in_account"),
-                })
-                return Citizen.Await(promise)
+                }
             end
         end
         table.insert(users, {
             name = getName(targetPlayer),
             identifier = userId,
         })
-        MySQL.Async.execute("UPDATE ps_banking_accounts SET users = @users WHERE id = @id", {
-            ["@users"] = json.encode(users),
-            ["@id"] = accountId,
-        }, function(rowsChanged)
-            promise:resolve({
-                success = rowsChanged > 0,
-                userName = getName(targetPlayer),
-            })
-        end)
+        local affectedRows = MySQL.update.await('UPDATE ps_banking_accounts SET users = ? WHERE id = ?', { json.encode(users), accountId })
+        return {
+            success = affectedRows > 0,
+            userName = getName(targetPlayer),
+        }
     else
-        promise:resolve({
+        return {
             success = false,
             message = locale("account_not_found"),
-        })
+        }
     end
-
-    return Citizen.Await(promise)
 end)
 
 lib.callback.register("ps-banking:server:removeUserFromAccount", function(source, accountId, userId)
@@ -412,10 +339,7 @@ lib.callback.register("ps-banking:server:removeUserFromAccount", function(source
     if not xPlayer then
         return false
     end
-    local promise = promise.new()
-    local accounts = MySQL.Sync.fetchAll("SELECT * FROM ps_banking_accounts WHERE id = @id", {
-        ["@id"] = accountId,
-    })
+    local accounts = MySQL.query.await('SELECT * FROM ps_banking_accounts WHERE id = ?', { accountId })
     if #accounts > 0 then
         local account = accounts[1]
         local users = json.decode(account.users)
@@ -425,16 +349,11 @@ lib.callback.register("ps-banking:server:removeUserFromAccount", function(source
                 table.insert(updatedUsers, user)
             end
         end
-        MySQL.Async.execute("UPDATE ps_banking_accounts SET users = @users WHERE id = @id", {
-            ["@users"] = json.encode(updatedUsers),
-            ["@id"] = accountId,
-        }, function(rowsChanged)
-            promise:resolve(rowsChanged > 0)
-        end)
+        local affectedRows = MySQL.update.await('UPDATE ps_banking_accounts SET users = ? WHERE id = ?', { json.encode(updatedUsers), accountId })
+        return affectedRows > 0
     else
-        promise:resolve(false)
+        return false
     end
-    return Citizen.Await(promise)
 end)
 
 lib.callback.register("ps-banking:server:renameAccount", function(source, id, newName)
@@ -442,14 +361,8 @@ lib.callback.register("ps-banking:server:renameAccount", function(source, id, ne
     if not xPlayer then
         return false
     end
-    local promise = promise.new()
-    MySQL.Async.execute("UPDATE ps_banking_accounts SET holder = @newName WHERE id = @id", {
-        ["@newName"] = newName,
-        ["@id"] = id,
-    }, function(rowsChanged)
-        promise:resolve(rowsChanged > 0)
-    end)
-    return Citizen.Await(promise)
+    local affectedRows = MySQL.update.await('UPDATE ps_banking_accounts SET holder = ? WHERE id = ?', { newName, id })
+    return affectedRows > 0
 end)
 
 lib.callback.register("ps-banking:server:ATMwithdraw", function(source, amount)
@@ -496,20 +409,14 @@ end)
 lib.callback.register("ps-banking:server:getBills", function(source)
     local xPlayer = getPlayerFromId(source)
     local identifier = getPlayerIdentifier(xPlayer)
-    local result = MySQL.Sync.fetchAll("SELECT * FROM ps_banking_bills WHERE identifier = @identifier", {
-        ["@identifier"] = identifier,
-    })
+    local result = MySQL.query.await('SELECT * FROM ps_banking_bills WHERE identifier = ?', { identifier })
     return result
 end)
 
 lib.callback.register("ps-banking:server:payBill", function(source, billId)
     local xPlayer = getPlayerFromId(source)
     local identifier = getPlayerIdentifier(xPlayer)
-    local result = MySQL.Sync.fetchAll(
-        "SELECT * FROM ps_banking_bills WHERE id = @id AND identifier = @identifier AND isPaid = 0", {
-            ["@id"] = billId,
-            ["@identifier"] = identifier,
-        })
+    local result = MySQL.query.await('SELECT * FROM ps_banking_bills WHERE id = ? AND identifier = ? AND isPaid = 0', { billId, identifier })
     if #result == 0 then
         return false
     end
@@ -521,9 +428,7 @@ lib.callback.register("ps-banking:server:payBill", function(source, billId)
         elseif framework == "QBCore" then
             xPlayer.Functions.RemoveMoney("bank", tonumber(amount))
         end
-        MySQL.Sync.execute("DELETE FROM ps_banking_bills WHERE id = @id", {
-            ["@id"] = billId,
-        })
+        MySQL.query.await('DELETE FROM ps_banking_bills WHERE id = ?', { billId })
         return true
     else
         return false
@@ -535,16 +440,8 @@ function createBill(data)
     local description = data.description
     local type = data.type
     local amount = data.amount
-    MySQL.Sync.execute(
-        "INSERT INTO ps_banking_bills (identifier, description, type, amount, date, isPaid) VALUES (@identifier, @description, @type, @amount, @date, @isPaid)",
-        {
-            ["@identifier"] = identifier,
-            ["@description"] = description,
-            ["@type"] = type,
-            ["@amount"] = amount,
-            ["@date"] = os.date("%Y-%m-%d"),
-            ["@isPaid"] = false,
-        })
+
+    MySQL.insert.await('INSERT INTO ps_banking_bills (identifier, description, type, amount, date, isPaid) VALUES (?, ?, ?, ?, NOW(), ?)', { identifier, description, type, amount, false })
 end
 exports("createBill", createBill)
 
