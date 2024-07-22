@@ -229,7 +229,7 @@ lib.callback.register("ps-banking:server:deleteAccount", function(source, accoun
         return false
     end
 
-    MySQL.query.await('DELETE FROM ps_banking_transactions WHERE accountId = ?', { accountId })
+    MySQL.query.await('DELETE FROM ps_banking_transactions WHERE id = ?', { accountId })
     return true
 end)
 
