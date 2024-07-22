@@ -1,5 +1,5 @@
 # ps-banking
-
+Compatible with QBCore and ESX.
 
 # Depedency
 1. [qb-core](https://github.com/qbcore-framework/qb-core) or [ESX](https://github.com/esx-framework)
@@ -31,3 +31,6 @@ Allows you to create, add, or remove accounts, rename accounts, and perform depo
 
 ### ATM Access
 Deposit and withdraw from ATMs.
+
+# Credits
+* [BachPB](https://github.com/BachPB)
