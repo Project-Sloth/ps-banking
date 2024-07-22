@@ -52,7 +52,7 @@ end)
 lib.callback.register("ps-banking:server:deleteHistory", function(source)
     local xPlayer = getPlayerFromId(source)
     local identifier = getPlayerIdentifier(xPlayer)
-    MySQL.update.await('DELETE FROM ps_banking_transactions WHERE identifier = ?', { identifier })
+    MySQL.query.await('DELETE FROM ps_banking_transactions WHERE identifier = ?', { identifier })
     return true
 end)
 
@@ -68,7 +68,7 @@ lib.callback.register("ps-banking:server:payAllBills", function(source)
         elseif framework == "QBCore" then
             xPlayer.Functions.RemoveMoney("bank", tonumber(totalAmount))
         end
-        MySQL.update.await('DELETE FROM ps_banking_bills WHERE identifier = ?', { identifier })
+        MySQL.query.await('DELETE FROM ps_banking_bills WHERE identifier = ?', { identifier })
         return true
     else
         return false
