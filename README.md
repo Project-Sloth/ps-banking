@@ -10,7 +10,7 @@ Compatible with QBCore and ESX.
 * Download release files.
 * Drag and drop resource into your server files.
 * Start resource through server.cfg.
-* Add the sql file to your database.
+* Add the ps-banking sql file to your database.
 * Restart your server.
 
 # Features
