@@ -174,11 +174,14 @@ RegisterNetEvent("ps-banking:server:logClient", function(account, moneyData)
 
     local currentBankBalance = getPlayerAccounts(xPlayer)
     local amountChange = currentBankBalance - previousBankBalance
-    local isIncome = currentBankBalance >= previousBankBalance and true or false
-    local description = locale("transaction_description")
 
-    logTransaction(identifier, description, account.name, math.abs(amountChange), isIncome)
+    if amountChange ~= 0 then
+        local isIncome = currentBankBalance >= previousBankBalance and true or false
+        local description = locale("transaction_description")
+        logTransaction(identifier, description, account.name, math.abs(amountChange), isIncome)
+    end
 end)
+
 
 lib.callback.register("ps-banking:server:getTransactionStats", function(source)
     local xPlayer = getPlayerFromId(source)
