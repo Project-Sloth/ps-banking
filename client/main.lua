@@ -57,11 +57,9 @@ end)
 
 -- ATM
 function ATM_Animation()
-    lib.requestAnimDict(Config.ATM_Animation.dict)
-    TaskPlayAnim(PlayerPedId(), Config.ATM_Animation.dict, Config.ATM_Animation.name, 8.0, -8.0, -1,
-        Config.ATM_Animation.flag, 0, false, false, false)
+	lib.playAnim(cache.ped, Config.ATM_Animation.dict, Config.ATM_Animation.name, 8.0, -8.0, -1, Config.ATM_Animation.flag, 0, false, 0, false)
     Wait(3000)
-    ClearPedTasks(PlayerPedId())
+    ClearPedTasks(cache.ped)
 end
 
 exports["qb-target"]:AddTargetModel(Config.ATM_Models, {
