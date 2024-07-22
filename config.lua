@@ -1,6 +1,7 @@
 lib.locale()
 Config = {}
 Config.LBPhone = false -- Does your server use lb-phone?
+Config.TargetSystem = "qb-target" -- Change to your target script like ox_target, qb-target, Or use devyn's interact.
 
 Config.Currency = {
     lang = "en", -- da-DK

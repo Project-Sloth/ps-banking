@@ -13,10 +13,53 @@ RegisterNUICallback("ps-banking:client:phoneOption", function(_, cb)
     cb(Config.LBPhone)
 end)
 
+-- Banks
+RegisterNetEvent('ps-banking:client:open:bank')
+AddEventHandler('ps-banking:client:open:bank', function()
+	Citizen.Wait(100)
+    SendNUIMessage({
+        action = "openBank",
+    })
+    SetNuiFocus(true, true)
+end)
+
 Citizen.CreateThread(function()
     local zoneId = 1
     for _, location in pairs(Config.BankLocations.Coords) do
         local zoneName = "bank_" .. zoneId
+        if Config.TargetSystem == "interact" then
+            exports.interact:AddInteraction({
+                coords = vec3(location.x, location.y, location.z),
+                distance = 2.5,
+                interactDst = 2.5,
+                id = locale("openBank").."interact",
+                name = locale("openBank").."interact:name",
+                options = {
+                     {
+                        label = 'Access Bank',
+                        action = function()
+                            SendNUIMessage({
+                                action = "openBank",
+                            })
+                            SetNuiFocus(true, true)
+                        end,
+                    },
+                }
+            })
+        elseif Config.TargetSystem == "ox_target" then
+            exports.ox_target:addBoxZone({
+                name = zoneName,
+                coords = vector3(location.x, location.y, location.z),
+                size = vec3(2, 2, 2),
+                options = {
+                    {
+                        event = "ps-banking:client:open:bank",
+                        icon = "fas fa-credit-card",
+                        label = locale("openBank"),
+                    },
+                },
+            })
+        else
         exports["qb-target"]:AddBoxZone(zoneName, vector3(location.x, location.y, location.z), 1.5, 1.6, {
             name = zoneName,
             heading = 0.0,
@@ -52,32 +95,75 @@ Citizen.CreateThread(function()
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(Config.BankLocations.Blips.name)
         EndTextCommandSetBlipName(blip)
+        end
     end
 end)
 
--- ATM
+-- ATMs
+RegisterNetEvent('ps-banking:client:open:atm')
+AddEventHandler('ps-banking:client:open:atm', function()
+	Citizen.Wait(100)
+    ATM_Animation()
+    SendNUIMessage({
+        action = "openATM",
+    })
+    SetNuiFocus(true, true)
+end)
+
 function ATM_Animation()
 	lib.playAnim(cache.ped, Config.ATM_Animation.dict, Config.ATM_Animation.name, 8.0, -8.0, -1, Config.ATM_Animation.flag, 0, false, 0, false)
     Wait(3000)
     ClearPedTasks(cache.ped)
 end
 
-exports["qb-target"]:AddTargetModel(Config.ATM_Models, {
-    options = {
-        {
-            icon = "fas fa-solid fa-money-bills",
-            label = locale("openATM"),
-            action = function()
-                ATM_Animation()
-                SendNUIMessage({
-                    action = "openATM",
-                })
-                SetNuiFocus(true, true)
-            end,
-        },
-    },
-    distance = 2.5,
-})
+Citizen.CreateThread(function()
+    if Config.TargetSystem == "interact" then
+        for _, ATM_Models in ipairs(Config.ATM_Models) do
+            exports.interact:AddModelInteraction({
+                model = ATM_Models,
+                offset = vec3(0.0, 0.0, 1.0),
+                name = locale("openATM") .. "interact:name",
+                id = locale("openATM") .. "interact",
+                distance = 2.5,
+                interactDst = 2.5,
+                options = {
+                    {
+                        label = locale("openATM"),
+                        event = "ps-banking:client:open:atm",
+                    },
+                }
+            })
+        end
+    elseif Config.TargetSystem == "ox_target" then
+        for _, ATM_Models in ipairs(Config.ATM_Models) do
+            exports.ox_target:addModel(ATM_Models, {
+                icon = "fas fa-solid fa-money-bills",
+                label = locale("openATM"),
+                event = "ps-banking:client:open:atm",
+                canInteract = function(_, distance)
+                    return distance < 2.5
+                end,
+            })
+        end
+    else
+        exports["qb-target"]:AddTargetModel(Config.ATM_Models, {
+            options = {
+                {
+                    icon = "fas fa-solid fa-money-bills",
+                    label = locale("openATM"),
+                    action = function()
+                        ATM_Animation()
+                        SendNUIMessage({
+                            action = "openATM",
+                        })
+                        SetNuiFocus(true, true)
+                    end,
+                },
+            },
+            distance = 2.5,
+        })
+    end
+end)
 
 if GetResourceState("es_extended") == "started" then
     framework = "ESX"
