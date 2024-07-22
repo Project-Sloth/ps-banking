@@ -4,7 +4,6 @@ Compatible with QBCore and ESX.
 # Depedency
 1. [qb-core](https://github.com/qbcore-framework/qb-core) or [ESX](https://github.com/esx-framework)
 2. [ox_lib](https://github.com/overextended/ox_lib)
-3. [ps-mdt](https://github.com/Project-Sloth/ps-mdt)
 
 # Installation
 * Download release files.
