@@ -123,7 +123,7 @@ lib.callback.register("ps-banking:server:transferMoney", function(source, data)
 end)
 
 local function logTransaction(identifier, description, accountName, amount, isIncome)
-    MySQL.update.await('INSERT INTO ps_banking_transactions (identifier, description, type, amount, date, isIncome) VALUES (?, ?, ?, ?, NOW(), ?)', { identifier, description, accountName, amount, isIncome })
+    MySQL.insert.await('INSERT INTO ps_banking_transactions (identifier, description, type, amount, date, isIncome) VALUES (?, ?, ?, ?, NOW(), ?)', { identifier, description, accountName, amount, isIncome })
 end
 
 RegisterNetEvent("ps-banking:server:logClient", function(account, moneyData)
@@ -441,7 +441,7 @@ function createBill(data)
     local type = data.type
     local amount = data.amount
 
-    MySQL.update.await('INSERT INTO ps_banking_bills (identifier, description, type, amount, date, isPaid) VALUES (?, ?, ?, ?, NOW(), ?)', { identifier, description, type, amount, false })
+    MySQL.insert.await('INSERT INTO ps_banking_bills (identifier, description, type, amount, date, isPaid) VALUES (?, ?, ?, ?, NOW(), ?)', { identifier, description, type, amount, false })
 end
 exports("createBill", createBill)
 
