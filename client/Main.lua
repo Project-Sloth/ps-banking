@@ -266,7 +266,7 @@ RegisterNUICallback("ps-banking:client:getMoneyTypes", function(data, cb)
         end
     end
 
-    print(json.encode(moneyData))
+    --print(json.encode(moneyData))
     cb(moneyData)
 end)
 
