@@ -3,7 +3,7 @@ game "gta5"
 author "Project Sloth"
 lua54 "yes"
 ui_page "html/index.html"
-version "1.0.0"
+version "1.0.1"
 -- ui_page "http://localhost:5173"
 
 client_scripts {
