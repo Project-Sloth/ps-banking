@@ -123,5 +123,17 @@
   "new_account_creation_failed": "Failed to create new account",
   "account_renamed_successfully": "Account renamed successfully",
   "account_rename_failed": "Account rename failed",
-  "rename_account": "Change name"
+  "rename_account": "Change name",
+  "no_framework_found": "No framework found",
+  "cannot_send_self_money": "You cannot send money to yourself",
+  "money_sent": "You have sent %s to %s",
+  "received_money": "You have received %s from %s",
+  "no_money": "You do not have enough money",
+  "user_not_in_city": "User is not in the city",
+  "transaction_description": "Transaction",
+  "cannot_add_self": "You cannot add yourself",
+  "player_not_found": "Player not found",
+  "target_player_not_found": "Target player not found",
+  "user_already_in_account": "User is already in the account",
+  "account_not_found": "Account not found"
 }
