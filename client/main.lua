@@ -112,7 +112,7 @@ end)
 
 function ATM_Animation()
 	lib.playAnim(cache.ped, Config.ATM_Animation.dict, Config.ATM_Animation.name, 8.0, -8.0, -1, Config.ATM_Animation.flag, 0, false, 0, false)
-    Wait(3000)
+    Wait(GetAnimDuration(Config.ATM_Animation.dict,Config.ATM_Animation.name) * 1000)
     ClearPedTasks(cache.ped)
 end
 
