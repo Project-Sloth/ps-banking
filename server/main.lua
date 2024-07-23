@@ -1,3 +1,6 @@
+lib.versionCheck('Project-Sloth/ps-banking')
+assert(lib.checkDependency('ox_lib', '3.20.0', true))
+
 local framework = nil
 
 if GetResourceState("es_extended") == "started" then
