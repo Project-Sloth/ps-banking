@@ -1,27 +1,35 @@
-fx_version "cerulean"
-game "gta5"
-author "Project Sloth"
-lua54 "yes"
-ui_page "html/index.html"
-version "1.0.2"
--- ui_page "http://localhost:5173"
+fx_version 'cerulean'
+game 'gta5'
+
+name 'ps-banking'
+author 'Project Sloth'
+version '1.0.1'
+
+ui_page 'html/index.html'
+-- ui_page 'http://localhost:5173'
+
+shared_scripts {
+    '@ox_lib/init.lua',
+    'config.lua',
+}
 
 client_scripts {
-    "client/**/*",
+    'client/**/*',
 }
 
 server_scripts {
-    "@oxmysql/lib/MySQL.lua",
-    "server/**/*",
-}
-
-shared_scripts {
-    "@ox_lib/init.lua",
-    "config.lua",
+    '@oxmysql/lib/MySQL.lua',
+    'server/**/*',
 }
 
 files {
-    "html/**/*",
-    "locales/**/*",
+    'html/**/*',
+    'locales/**/*',
 }
 
+dependencies {
+    'ox_lib',
+    'oxmysql'
+}
+
+lua54 'yes'
