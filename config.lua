@@ -49,3 +49,5 @@ Config.ATM_Models = {
     "prop_atm_03",
     "prop_fleeca_atm",
 }
+
+Config.OpenAtmOnlyWhenClose = false -- Open the ATM only when the player is close enought

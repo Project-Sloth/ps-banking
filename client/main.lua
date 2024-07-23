@@ -102,6 +102,14 @@ end)
 -- ATMs
 RegisterNetEvent('ps-banking:client:open:atm')
 AddEventHandler('ps-banking:client:open:atm', function()
+    if Config.OpenAtmOnlyWhenClose then -- Prevent the user trigger this event when is far away from an ATM model. FALSE Default
+         for _, ATM_Models in ipairs(Config.ATM_Models) do
+            local Atm = joaat(ATM_Models)
+            local coords = GetEntityCoords(PlayerPedId())
+            local object = GetClosestObjectOfType(coords.x,coords.y,coords.z,2.5,Atm,false,true,true)
+            if not object then return end -- Didnt find the object, returning.
+         end
+    end
 	Citizen.Wait(100)
     ATM_Animation()
     SendNUIMessage({
