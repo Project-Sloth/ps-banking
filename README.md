@@ -14,8 +14,9 @@ Compatible with QBCore and ESX.
 
 ## Exports
 
+### Create Bill
 ```bash
-    # creates a bill invoice in the bank
+    # Creates a bill invoice in the bank
     exports["ps-banking"]:createBill({
         identifier = "HVZ84591", -- citizen id
         description = "Utility Bill", 
