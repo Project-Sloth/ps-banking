@@ -308,7 +308,7 @@ lib.callback.register("ps-banking:server:addUserToAccount", function(source, acc
             message = locale("target_player_not_found"),
         }
     end
-    local accounts = MySQL.update.await('SELECT * FROM ps_banking_accounts WHERE id = ?', { accountId })
+    local accounts = MySQL.query.await('SELECT * FROM ps_banking_accounts WHERE id = ?', { accountId })
     if #accounts > 0 then
         local account = accounts[1]
         local users = json.decode(account.users)
@@ -322,7 +322,7 @@ lib.callback.register("ps-banking:server:addUserToAccount", function(source, acc
         end
         table.insert(users, {
             name = getName(targetPlayer),
-            identifier = userId,
+            identifier = getPlayerIdentifier(targetPlayer),
         })
         local affectedRows = MySQL.update.await('UPDATE ps_banking_accounts SET users = ? WHERE id = ?', { json.encode(users), accountId })
         return {
