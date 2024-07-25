@@ -375,38 +375,41 @@
                 >
                   <i class="fa-duotone fa-copy"></i>
                 </button>
-                {#if account.owner.state}
+                {#if account.owner.identifier === get(userData).identifier || account.users.some(user => user.identifier === get(userData).identifier)}
                   <button
                     class="text-gray-400 hover:text-blue-300 duration-500"
                     on:click={() => showRenameModal.set(account.id)}
                   >
                     <i class="fa-duotone fa-pen"></i>
                   </button>
-                  <button
-                    class="text-gray-400 hover:text-blue-300 duration-500"
-                    on:click={() => showModal.set(account.id)}
-                  >
-                    <i class="fa-duotone fa-user-plus"></i>
-                  </button>
-                  <button
-                    class="text-gray-400 hover:text-blue-300 duration-500"
-                    on:click={() => {
-                      selectedAccount.set(account.id);
-                      selectedUser.set("");
-                      showRemoveUserModal.set(true);
-                    }}
-                  >
-                    <i class="fa-duotone fa-user-minus"></i>
-                  </button>
-                  <button
-                    class="text-red-400 hover:text-red-300 duration-500"
-                    on:click={() => {
-                      selectedAccount.set(account.id);
-                      showDeleteModal.set(true);
-                    }}
-                  >
-                    <i class="fa-duotone fa-trash"></i>
-                  </button>
+                  {#if account.owner.identifier === get(userData).identifier}
+                    <button
+                      class="text-gray-400 hover:text-blue-300 duration-500"
+                      on:click={() => showModal.set(account.id)}
+                    >
+                      <i class="fa-duotone fa-user-plus"></i>
+                    </button>
+                    <button
+                      class="text-gray-400 hover:text-blue-300 duration-500"
+                      on:click={() => {
+                        selectedAccount.set(account.id);
+                        selectedUser.set("");
+                        showRemoveUserModal.set(true);
+                      }}
+                    >
+                      <i class="fa-duotone fa-user-minus"></i>
+                    </button>
+                    
+                      <button
+                        class="text-red-400 hover:text-red-300 duration-500"
+                        on:click={() => {
+                        selectedAccount.set(account.id);
+                        showDeleteModal.set(true);
+                        }}
+                      >
+                        <i class="fa-duotone fa-trash"></i>
+                      </button>
+                  {/if}
                   <button
                     class="text-green-400 hover:text-green-300 duration-500"
                     on:click={() => {
