@@ -12,6 +12,19 @@ Compatible with QBCore and ESX.
 * Add the ps-banking sql file to your database.
 * Restart your server.
 
+## Exports
+
+### Create Bill
+```bash
+    # Creates a bill invoice in the bank
+    exports["ps-banking"]:createBill({
+        identifier = "HVZ84591", -- citizen id
+        description = "Utility Bill", 
+        type = "Expense",
+        amount = 150.00,
+    })
+```
+
 # Features
 ### Overview Tab:
 Includes all essential features such as managing your bills, withdrawing all money, depositing cash, transferring money weekly via Simmy, viewing the latest transactions, and handling unpaid invoices.
