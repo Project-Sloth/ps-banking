@@ -16,14 +16,14 @@ end)
 -- Banks
 RegisterNetEvent('ps-banking:client:open:bank')
 AddEventHandler('ps-banking:client:open:bank', function()
-	Citizen.Wait(100)
+	Wait(100)
     SendNUIMessage({
         action = "openBank",
     })
     SetNuiFocus(true, true)
 end)
 
-Citizen.CreateThread(function()
+CreateThread(function()
     local zoneId = 1
     for _, location in pairs(Config.BankLocations.Coords) do
         local zoneName = "bank_" .. zoneId
@@ -102,7 +102,7 @@ end)
 -- ATMs
 RegisterNetEvent('ps-banking:client:open:atm')
 AddEventHandler('ps-banking:client:open:atm', function()
-	Citizen.Wait(100)
+	Wait(100)
     ATM_Animation()
     SendNUIMessage({
         action = "openATM",
@@ -116,7 +116,7 @@ function ATM_Animation()
     ClearPedTasks(cache.ped)
 end
 
-Citizen.CreateThread(function()
+CreateThread(function()
     if Config.TargetSystem == "interact" then
         for _, ATM_Models in ipairs(Config.ATM_Models) do
             exports.interact:AddModelInteraction({
