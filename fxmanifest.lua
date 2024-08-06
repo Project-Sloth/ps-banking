@@ -3,7 +3,7 @@ game 'gta5'
 
 name 'ps-banking'
 author 'Project Sloth'
-version '1.0.3'
+version '1.0.4'
 
 ui_page 'html/index.html'
 -- ui_page 'http://localhost:5173'
