@@ -16,7 +16,7 @@ end)
 -- Banks
 RegisterNetEvent('ps-banking:client:open:bank')
 AddEventHandler('ps-banking:client:open:bank', function()
-	Citizen.Wait(100)
+    Citizen.Wait(100)
     SendNUIMessage({
         action = "openBank",
     })
@@ -32,10 +32,10 @@ Citizen.CreateThread(function()
                 coords = vec3(location.x, location.y, location.z),
                 distance = 2.5,
                 interactDst = 2.5,
-                id = locale("openBank").."interact",
-                name = locale("openBank").."interact:name",
+                id = locale("openBank") .. "interact",
+                name = locale("openBank") .. "interact:name",
                 options = {
-                     {
+                    {
                         label = 'Access Bank',
                         action = function()
                             SendNUIMessage({
@@ -60,59 +60,87 @@ Citizen.CreateThread(function()
                 },
             })
         else
-        exports["qb-target"]:AddBoxZone(zoneName, vector3(location.x, location.y, location.z), 1.5, 1.6, {
-            name = zoneName,
-            heading = 0.0,
-            debugPoly = false,
-            minZ = location.z - 1,
-            maxZ = location.z + 1,
-        }, {
-            options = {
-                {
-                    icon = "fas fa-credit-card",
-                    label = locale("openBank"),
-                    action = function()
-                        SendNUIMessage({
-                            action = "openBank",
-                        })
-                        SetNuiFocus(true, true)
-                    end,
+            exports["qb-target"]:AddBoxZone(zoneName, vector3(location.x, location.y, location.z), 1.5, 1.6, {
+                name = zoneName,
+                heading = 0.0,
+                debugPoly = false,
+                minZ = location.z - 1,
+                maxZ = location.z + 1,
+            }, {
+                options = {
+                    {
+                        icon = "fas fa-credit-card",
+                        label = locale("openBank"),
+                        action = function()
+                            SendNUIMessage({
+                                action = "openBank",
+                            })
+                            SetNuiFocus(true, true)
+                        end,
+                    },
                 },
-            },
-            distance = 2.5,
-        })
-        zoneId = zoneId + 1
-    end
+                distance = 2.5,
+            })
+            zoneId = zoneId + 1
+        end
 
-    for i = 1, #Config.BankLocations.Coords do
-        local blip = AddBlipForCoord(vector3(Config.BankLocations.Coords[i].x, Config.BankLocations.Coords[i].y,
-            Config.BankLocations.Coords[i].z))
-        SetBlipSprite(blip, Config.BankLocations.Blips.sprite)
-        SetBlipDisplay(blip, 4)
-        SetBlipScale(blip, Config.BankLocations.Blips.scale)
-        SetBlipColour(blip, Config.BankLocations.Blips.color)
-        SetBlipAsShortRange(blip, true)
-        BeginTextCommandSetBlipName("STRING")
-        AddTextComponentSubstringPlayerName(Config.BankLocations.Blips.name)
-        EndTextCommandSetBlipName(blip)
+        for i = 1, #Config.BankLocations.Coords do
+            local blip = AddBlipForCoord(vector3(Config.BankLocations.Coords[i].x, Config.BankLocations.Coords[i].y,
+                Config.BankLocations.Coords[i].z))
+            SetBlipSprite(blip, Config.BankLocations.Blips.sprite)
+            SetBlipDisplay(blip, 4)
+            SetBlipScale(blip, Config.BankLocations.Blips.scale)
+            SetBlipColour(blip, Config.BankLocations.Blips.color)
+            SetBlipAsShortRange(blip, true)
+            BeginTextCommandSetBlipName("STRING")
+            AddTextComponentSubstringPlayerName(Config.BankLocations.Blips.name)
+            EndTextCommandSetBlipName(blip)
         end
     end
 end)
 
--- ATMs
-RegisterNetEvent('ps-banking:client:open:atm')
-AddEventHandler('ps-banking:client:open:atm', function()
-	Citizen.Wait(100)
+---
+--- Checks if the player is close to an ATM
+---
+--- @return boolean Returns true if the player is close to an ATM, false otherwise
+local function isCloseToAnAtm()
+    local length = #Config.ATM_Models
+    local found = false
+    for i = 1, length do
+        local el = Config.ATM_Models[i]
+        local Atm = joaat(el)
+        local coords = GetEntityCoords(PlayerPedId())
+        local object = GetClosestObjectOfType(coords.x, coords.y, coords.z, 2.5, Atm, false, true, true)
+        found = object > 0 and true or false
+    end
+    return not not found
+end
+
+local function openAtm()
+    if IsNuiFocused() then
+        SetNuiFocus(false, false)
+    end
+    if not isCloseToAnAtm() then
+        print("No ATM found nearby for you to access")
+        return
+    end
+    Wait(100)
     ATM_Animation()
     SendNUIMessage({
         action = "openATM",
     })
     SetNuiFocus(true, true)
+end
+-- ATMs
+RegisterNetEvent('ps-banking:client:open:atm')
+AddEventHandler('ps-banking:client:open:atm', function()
+    print("This event is Deprecated, use the export openAtm()")
 end)
 
 function ATM_Animation()
-	lib.playAnim(cache.ped, Config.ATM_Animation.dict, Config.ATM_Animation.name, 8.0, -8.0, -1, Config.ATM_Animation.flag, 0, false, 0, false)
-    Wait(GetAnimDuration(Config.ATM_Animation.dict,Config.ATM_Animation.name) * 1000)
+    lib.playAnim(cache.ped, Config.ATM_Animation.dict, Config.ATM_Animation.name, 8.0, -8.0, -1,
+        Config.ATM_Animation.flag, 0, false, 0, false)
+    Wait(GetAnimDuration(Config.ATM_Animation.dict, Config.ATM_Animation.name) * 1000)
     ClearPedTasks(cache.ped)
 end
 
@@ -129,7 +157,9 @@ Citizen.CreateThread(function()
                 options = {
                     {
                         label = locale("openATM"),
-                        event = "ps-banking:client:open:atm",
+                        action = function(entity, coords, args)
+                            openAtm()
+                        end
                     },
                 }
             })
@@ -139,7 +169,9 @@ Citizen.CreateThread(function()
             exports.ox_target:addModel(ATM_Models, {
                 icon = "fas fa-solid fa-money-bills",
                 label = locale("openATM"),
-                event = "ps-banking:client:open:atm",
+                onSelect = function(data)
+                    openAtm()
+                end,
                 canInteract = function(_, distance)
                     return distance < 2.5
                 end,
@@ -152,11 +184,7 @@ Citizen.CreateThread(function()
                     icon = "fas fa-solid fa-money-bills",
                     label = locale("openATM"),
                     action = function()
-                        ATM_Animation()
-                        SendNUIMessage({
-                            action = "openATM",
-                        })
-                        SetNuiFocus(true, true)
+                        openAtm()
                     end,
                 },
             },
@@ -361,3 +389,4 @@ RegisterNUICallback("ps-banking:client:getAmountPresets", function(_, cb)
         grid = Config.PresetATM_Amounts.Grid,
     }))
 end)
+exports("openAtm", openAtm)
