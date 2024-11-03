@@ -26,7 +26,7 @@
     "from": "Van",
     "delete_all_transactions": "Verwijder alle transacties",
     "are_you_sure": "Weet je het zeker?",
-    "delete_confirmation": "Weet je zeker dat je al je transacties wilt verwijderen? (Doe dit alleen als het menu vertraagd!)",
+    "delete_confirmation": "Weet je zeker dat je al je transacties wilt verwijderen? (Doe dit alleen wanneer je lag ervaart!)",
     "cancel": "Annuleren",
     "confirm": "Bevestigen",
     "history_empty": "Je geschiedenis is leeg",
@@ -59,7 +59,7 @@
     "expenses": "Uitgaven",
     "report": "Rapport",
     "latest_transactions": "Laatste Transacties",
-    "see_all": "ZIEN ALLES",
+    "see_all": "TOON ALLE",
     "unpaid_bills": "Onbetaalde Facturen",
     "no_unpaid_bills": "Geen onbetaalde facturen",
     "confirm_pay_all_bills": "Weet je zeker dat je al je rekeningen wilt betalen?",
@@ -134,7 +134,7 @@
     "cannot_add_self": "Je kunt jezelf niet toevoegen",
     "player_not_found": "Speler niet gevonden",
     "target_player_not_found": "Doelspeler niet gevonden",
-    "user_already_in_account": "Gebruiker is al in de rekening",
+    "user_already_in_account": "Gebruiker is reeds toegevoegd",
     "account_not_found": "Rekening niet gevonden"
   }
   
