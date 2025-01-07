@@ -84,9 +84,7 @@ Citizen.CreateThread(function()
         zoneId = zoneId + 1
     end
 
-    for i = 1, #Config.BankLocations.Coords do
-        local blip = AddBlipForCoord(vector3(Config.BankLocations.Coords[i].x, Config.BankLocations.Coords[i].y,
-            Config.BankLocations.Coords[i].z))
+        local blip = AddBlipForCoord(vector3(location.x, location.y,location.z))
         SetBlipSprite(blip, Config.BankLocations.Blips.sprite)
         SetBlipDisplay(blip, 4)
         SetBlipScale(blip, Config.BankLocations.Blips.scale)
@@ -95,7 +93,6 @@ Citizen.CreateThread(function()
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(Config.BankLocations.Blips.name)
         EndTextCommandSetBlipName(blip)
-        end
     end
 end)
 
