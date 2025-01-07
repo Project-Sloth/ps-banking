@@ -27,9 +27,10 @@ Citizen.CreateThread(function()
     local zoneId = 1
     for _, location in pairs(Config.BankLocations.Coords) do
         local zoneName = "bank_" .. zoneId
+	local banksCoords = vec3(location.x, location.y, location.z)
         if Config.TargetSystem == "interact" then
             exports.interact:AddInteraction({
-                coords = vec3(location.x, location.y, location.z),
+                coords = banksCoords,
                 distance = 2.5,
                 interactDst = 2.5,
                 id = locale("openBank").."interact",
@@ -49,7 +50,7 @@ Citizen.CreateThread(function()
         elseif Config.TargetSystem == "ox_target" then
             exports.ox_target:addBoxZone({
                 name = zoneName,
-                coords = vector3(location.x, location.y, location.z),
+                coords = banksCoords,
                 size = vec3(2, 2, 2),
                 options = {
                     {
@@ -60,7 +61,7 @@ Citizen.CreateThread(function()
                 },
             })
         else
-        exports["qb-target"]:AddBoxZone(zoneName, vector3(location.x, location.y, location.z), 1.5, 1.6, {
+        exports["qb-target"]:AddBoxZone(zoneName, banksCoords , 1.5, 1.6, {
             name = zoneName,
             heading = 0.0,
             debugPoly = false,
@@ -84,7 +85,7 @@ Citizen.CreateThread(function()
         zoneId = zoneId + 1
     end
 
-        local blip = AddBlipForCoord(vector3(location.x, location.y,location.z))
+        local blip = AddBlipForCoord(banksCoords)
         SetBlipSprite(blip, Config.BankLocations.Blips.sprite)
         SetBlipDisplay(blip, 4)
         SetBlipScale(blip, Config.BankLocations.Blips.scale)
